@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
@@ -8,6 +8,8 @@ import { SurveyContext } from '../../utils/context'
 import { useFetch } from '../../utils/hooks'
 import { useSelector } from 'react-redux'
 import { selectTheme } from '../../utils/selectors'
+import { useStore } from 'react-redux'
+import { fetchOrUpdateSurvey } from '../../features/survey'
 
 const SurveyContainer = styled.div`
   display: flex;
@@ -64,6 +66,12 @@ const ReplyWrapper = styled.div`
 `
 
 function Survey() {
+    const store = useStore()
+
+    useEffect( () => {
+        fetchOrUpdateSurvey( store )
+    }, [ store ] )
+
     const { questionNumber } = useParams()
     const questionNumberInt = parseInt( questionNumber )
     const prevQuestionNumber = questionNumberInt === 1 ? 1 : questionNumberInt - 1

@@ -2,6 +2,8 @@ import { combineReducers } from 'redux'
 import { configureStore } from '@reduxjs/toolkit'
 import themeReducer from '../features/theme'
 import freelancesReducer from '../features/freelances'
+import surveyReducer from '../features/survey'
+import profileReducer from '../features/profile'
 
 //seemed to function without ?
 const reduxDevtools = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
@@ -9,7 +11,9 @@ const reduxDevtools = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVT
 
 const reducer = combineReducers( {
     theme: themeReducer,
-    freelances: freelancesReducer
+    freelances: freelancesReducer,
+    survey: surveyReducer,
+    profile: profileReducer
 } )
 
 
