@@ -30,21 +30,23 @@ const profileRejected = createAction( 'profile/rejected',
 )
 
 
-export async function fetchOrUpdateProfile( store, freelanceId ) {
+export function fetchOrUpdateProfile( freelanceId ) {
 
-    const profileId = selectProfile( freelanceId )
-    const status = profileId( store.getState() ).status
-    if ( status === 'pending' || status === 'updating' ) {
-        return
-    }
-    store.dispatch( profileFetching( freelanceId ) )
-    try {
-        const response = await fetch( `http://localhost:8000/freelance?id=${ freelanceId }` )
-        const data = await response.json()
-        store.dispatch( profileResolved( freelanceId, data ) )
-    }
-    catch ( error ) {
-        store.dispatch( profileRejected( freelanceId, error ) )
+    return async ( dispatch, getState ) => {
+        const profileId = selectProfile( freelanceId )
+        const status = profileId( getState() ).status
+        if ( status === 'pending' || status === 'updating' ) {
+            return
+        }
+        dispatch( profileFetching( freelanceId ) )
+        try {
+            const response = await fetch( `http://localhost:8000/freelance?id=${ freelanceId }` )
+            const data = await response.json()
+            dispatch( profileResolved( freelanceId, data ) )
+        }
+        catch ( error ) {
+            dispatch( profileRejected( freelanceId, error ) )
+        }
     }
 }
 

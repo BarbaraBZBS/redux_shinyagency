@@ -9,3 +9,9 @@ const voidFreelance = { status: 'void' }
 export const selectProfile = ( freelanceId ) => ( state ) => {
     return state.profile[ freelanceId ] ?? voidFreelance
 }
+
+const voidResult = { status: 'void' }
+
+export const selectResults = ( resultId ) => ( state ) => {
+    return state.results[ resultId ] ?? voidResult
+}

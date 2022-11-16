@@ -4,6 +4,7 @@ import themeReducer from '../features/theme'
 import freelancesReducer from '../features/freelances'
 import surveyReducer from '../features/survey'
 import profileReducer from '../features/profile'
+import resultsReducer from '../features/results'
 
 //seemed to function without ?
 const reduxDevtools = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
@@ -26,7 +27,8 @@ export default configureStore( {
         theme: themeReducer,
         freelances: freelancesReducer,
         survey: surveyReducer,
-        profile: profileReducer
+        profile: profileReducer,
+        results: resultsReducer
     },
     reduxDevtools
 } )

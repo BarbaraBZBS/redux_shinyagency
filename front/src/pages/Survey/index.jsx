@@ -6,9 +6,8 @@ import colors from '../../utils/style/colors'
 import { Loader } from '../../utils/style/Atoms'
 import { SurveyContext } from '../../utils/context'
 import { useFetch } from '../../utils/hooks'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { selectTheme } from '../../utils/selectors'
-import { useStore } from 'react-redux'
 import { fetchOrUpdateSurvey } from '../../features/survey'
 
 const SurveyContainer = styled.div`
@@ -66,11 +65,11 @@ const ReplyWrapper = styled.div`
 `
 
 function Survey() {
-    const store = useStore()
+    const dispatch = useDispatch()
 
     useEffect( () => {
-        fetchOrUpdateSurvey( store )
-    }, [ store ] )
+        dispatch( fetchOrUpdateSurvey )
+    }, [ dispatch ] )
 
     const { questionNumber } = useParams()
     const questionNumberInt = parseInt( questionNumber )
