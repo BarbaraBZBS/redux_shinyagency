@@ -5,6 +5,8 @@ import freelancesReducer from '../features/freelances'
 import surveyReducer from '../features/survey'
 import profileReducer from '../features/profile'
 import resultsReducer from '../features/results'
+import answersReducer from '../features/answers'
+
 
 //seemed to function without ?
 const reduxDevtools = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
@@ -28,7 +30,8 @@ export default configureStore( {
         freelances: freelancesReducer,
         survey: surveyReducer,
         profile: profileReducer,
-        results: resultsReducer
+        results: resultsReducer,
+        answers: answersReducer
     },
     reduxDevtools
 } )

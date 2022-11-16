@@ -1,14 +1,13 @@
-import { useContext, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import colors from '../../utils/style/colors'
 import { Loader } from '../../utils/style/Atoms'
-import { SurveyContext } from '../../utils/context'
-import { useFetch } from '../../utils/hooks'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectTheme } from '../../utils/selectors'
+import { selectAnswers, selectSurvey, selectTheme } from '../../utils/selectors'
 import { fetchOrUpdateSurvey } from '../../features/survey'
+import { saveAnswers } from '../../features/answers'
 
 const SurveyContainer = styled.div`
   display: flex;
@@ -76,16 +75,18 @@ function Survey() {
     const prevQuestionNumber = questionNumberInt === 1 ? 1 : questionNumberInt - 1
     const nextQuestionNumber = questionNumberInt + 1
     const theme = useSelector( selectTheme )
+    const survey = useSelector( selectSurvey )
+    const answers = useSelector( selectAnswers )
 
-    const { saveAnswers, answers } = useContext( SurveyContext )
 
     function saveReply( answer ) {
-        saveAnswers( { [ questionNumber ]: answer } )
+        dispatch( saveAnswers( { questionNumber, answer } ) )
     }
-    const { data, isLoading, error } = useFetch( `http://localhost:8000/survey` )
-    const surveyData = data?.surveyData
+    const surveyData = survey.data?.surveyData
 
-    if ( error ) {
+    const isLoading = survey.status === 'void' || survey.status === 'pending'
+
+    if ( survey.status === 'rejected' ) {
         return <span>Il y a un problème</span>
     }
 

@@ -2,10 +2,9 @@ import { useEffect } from 'react'
 import styled from 'styled-components'
 import { useParams } from 'react-router'
 import colors from '../../utils/style/colors'
-import { selectTheme } from '../../utils/selectors'
+import { selectTheme, selectProfile } from '../../utils/selectors'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchOrUpdateProfile } from '../../features/profile'
-import { selectProfile } from '../../utils/selectors'
 
 const ProfileWrapper = styled.div`
   display: flex;

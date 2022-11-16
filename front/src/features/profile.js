@@ -1,34 +1,7 @@
 import { selectProfile } from '../utils/selectors'
-import { createAction, createReducer } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {};
-
-
-//action creators
-const profileFetching = createAction( 'profile/fetching',
-    ( freelanceId ) => {
-        return {
-            payload: { freelanceId }
-        }
-    }
-)
-
-const profileResolved = createAction( 'profile/resolved',
-    ( freelanceId, data ) => {
-        return {
-            payload: { freelanceId, data }
-        }
-    }
-)
-
-const profileRejected = createAction( 'profile/rejected',
-    ( freelanceId, error ) => {
-        return {
-            payload: { freelanceId, error }
-        }
-    }
-)
-
 
 export function fetchOrUpdateProfile( freelanceId ) {
 
@@ -38,20 +11,17 @@ export function fetchOrUpdateProfile( freelanceId ) {
         if ( status === 'pending' || status === 'updating' ) {
             return
         }
-        dispatch( profileFetching( freelanceId ) )
+        dispatch( actions.fetching( freelanceId ) )
         try {
             const response = await fetch( `http://localhost:8000/freelance?id=${ freelanceId }` )
             const data = await response.json()
-            dispatch( profileResolved( freelanceId, data ) )
+            dispatch( actions.resolved( freelanceId, data ) )
         }
         catch ( error ) {
-            dispatch( profileRejected( freelanceId, error ) )
+            dispatch( actions.rejected( freelanceId, error ) )
         }
     }
 }
-
-
-//reducer
 
 function setVoidIfUndefined( draft, freelanceId ) {
     if ( draft[ freelanceId ] === undefined ) {
@@ -59,44 +29,65 @@ function setVoidIfUndefined( draft, freelanceId ) {
     }
 }
 
-export default createReducer( initialState, ( builder ) =>
-    builder
-        .addCase( profileFetching, ( draft, action ) => {
-            setVoidIfUndefined( draft, action.payload.freelanceId )
-            if ( draft[ action.payload.freelanceId ].status === 'void' ) {
-                draft[ action.payload.freelanceId ].status = 'pending';
+const { actions, reducer } = createSlice( {
+    name: 'profile',
+    initialState,
+    reducers: {
+        fetching: {
+            prepare: ( freelanceId ) => ( {
+                payload: { freelanceId }
+            } ),
+            reducer: ( draft, action ) => {
+                setVoidIfUndefined( draft, action.payload.freelanceId )
+                if ( draft[ action.payload.freelanceId ].status === 'void' ) {
+                    draft[ action.payload.freelanceId ].status = 'pending';
+                    return
+                }
+                if ( draft[ action.payload.freelanceId ].status === 'rejected' ) {
+                    draft[ action.payload.freelanceId ].error = null;
+                    draft[ action.payload.freelanceId ].status = 'pending';
+                    return
+                }
+                if ( draft[ action.payload.freelanceId ].status === 'resolved' ) {
+                    draft[ action.payload.freelanceId ].status = 'updating';
+                    return
+                }
+            }
+        },
+        resolved: {
+            prepare: ( freelanceId, data ) => ( {
+                payload: { freelanceId, data }
+            } ),
+            reducer: ( draft, action ) => {
+                setVoidIfUndefined( draft, action.payload.freelanceId )
+                if ( draft[ action.payload.freelanceId ].status === 'pending' ||
+                    draft[ action.payload.freelanceId ].status === 'updating' ) {
+                    draft[ action.payload.freelanceId ].data = action.payload.data
+                    draft[ action.payload.freelanceId ].status = 'resolved'
+                    return
+                }
                 return
             }
-            if ( draft[ action.payload.freelanceId ].status === 'rejected' ) {
-                draft[ action.payload.freelanceId ].error = null;
-                draft[ action.payload.freelanceId ].status = 'pending';
+        },
+        rejected: {
+            prepare: ( freelanceId, error ) => ( {
+                payload: { freelanceId, error }
+            } ),
+            reducer: ( draft, action ) => {
+                setVoidIfUndefined( draft, action.payload.freelanceId )
+                if ( draft[ action.payload.freelanceId ].status === 'pending' ||
+                    draft[ action.payload.freelanceId ].status === 'updating' ) {
+                    draft[ action.payload.freelanceId ].error = action.payload.error
+                    draft[ action.payload.freelanceId ].data = null
+                    draft[ action.payload.freelanceId ].status = 'rejected'
+                    return
+                }
                 return
             }
-            if ( draft[ action.payload.freelanceId ].status === 'resolved' ) {
-                draft[ action.payload.freelanceId ].status = 'updating';
-                return
-            }
-            return
-        } )
-        .addCase( profileResolved, ( draft, action ) => {
-            setVoidIfUndefined( draft, action.payload.freelanceId )
-            if ( draft[ action.payload.freelanceId ].status === 'pending' ||
-                draft[ action.payload.freelanceId ].status === 'updating' ) {
-                draft[ action.payload.freelanceId ].data = action.payload.data
-                draft[ action.payload.freelanceId ].status = 'resolved'
-                return
-            }
-            return
-        } )
-        .addCase( profileRejected, ( draft, action ) => {
-            setVoidIfUndefined( draft, action.payload.freelanceId )
-            if ( draft[ action.payload.freelanceId ].status === 'pending' ||
-                draft[ action.payload.freelanceId ].status === 'updating' ) {
-                draft[ action.payload.freelanceId ].error = action.payload.error
-                draft[ action.payload.freelanceId ].data = null
-                draft[ action.payload.freelanceId ].status = 'rejected'
-                return
-            }
-            return
-        } )
-)
+        },
+    }
+} )
+
+export const { fetching, resolved, rejected } = actions
+
+export default reducer

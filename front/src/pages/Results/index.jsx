@@ -1,12 +1,10 @@
-import { useContext, useEffect } from 'react'
+import { useEffect } from 'react'
 import styled from 'styled-components'
 import EmptyList from '../../components/EmptyList'
-import { SurveyContext } from '../../utils/context'
 import colors from '../../utils/style/colors'
-import { useFetch } from '../../utils/hooks'
 import { StyledLink, Loader } from '../../utils/style/Atoms'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectTheme } from '../../utils/selectors'
+import { selectAnswers, selectResults, selectTheme } from '../../utils/selectors'
 import { fetchOrUpdateResults } from '../../features/results'
 
 const ResultsContainer = styled.div`
@@ -77,22 +75,24 @@ export function formatJobList( title, listLength, index ) {
 function Results() {
     const dispatch = useDispatch()
     const theme = useSelector( selectTheme )
-    const { answers } = useContext( SurveyContext )
+    const answers = useSelector( selectAnswers )
     const queryParams = formatQueryParams( answers )
+    const results = useSelector( selectResults )
 
     useEffect( () => {
         dispatch( fetchOrUpdateResults( queryParams ) )
     }, [ dispatch, queryParams ] )
 
-    const { data, isLoading, error } = useFetch(
-        `http://localhost:8000/results?${ queryParams }`
-    )
-
-    if ( error ) {
+    if ( results.status === 'rejected' ) {
         return <span>Il y a un problème</span>
     }
 
-    const resultsData = data?.resultsData
+    const resultsData = results.data?.resultsData
+
+    const isLoading =
+        results.status === 'void' ||
+        results.status === 'pending' ||
+        results.status === 'updating'
 
     if ( resultsData?.length < 1 ) {
         return <EmptyList theme={ theme } />
