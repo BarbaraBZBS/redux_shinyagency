@@ -1,23 +1,20 @@
-const TOGGLE_THEME = 'theme/toggle'
-const SET_THEME = 'theme/set'
+import { createAction, createReducer } from "@reduxjs/toolkit"
+
 
 //action creators
+export const toggleTheme = createAction( 'theme/toggle' )
 
-export const toggleTheme = () => ( { type: TOGGLE_THEME } )
+export const setTheme = createAction( 'theme/set' )
+// setTheme( 'light' )
 
-export const setTheme = ( theme = 'light' ) => ( {
-    type: SET_THEME,
-    payload: theme
-} )
 
 //reducer
-
-export default function reducer( state = 'light', action ) {
-    if ( action.type === TOGGLE_THEME ) {
-        return state === 'light' ? 'dark' : 'light'
-    }
-    if ( action.type === SET_THEME ) {
-        return action.payload
-    }
-    return state
-}
+export default createReducer( 'light', ( builder ) => {
+    builder
+        .addCase( toggleTheme, ( state ) => {
+            return state === 'light' ? 'dark' : 'light'
+        } )
+        .addCase( setTheme, ( state, action ) => {
+            return action.payload
+        } )
+} )

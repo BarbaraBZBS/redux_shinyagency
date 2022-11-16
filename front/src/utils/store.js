@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux'
+// import { combineReducers } from 'redux'
 import { configureStore } from '@reduxjs/toolkit'
 import themeReducer from '../features/theme'
 import freelancesReducer from '../features/freelances'
@@ -9,14 +9,24 @@ import profileReducer from '../features/profile'
 const reduxDevtools = window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 
 
-const reducer = combineReducers( {
-    theme: themeReducer,
-    freelances: freelancesReducer,
-    survey: surveyReducer,
-    profile: profileReducer
+// const reducer = combineReducers( {
+//     theme: themeReducer,
+//     freelances: freelancesReducer,
+//     survey: surveyReducer,
+//     profile: profileReducer
+// } )
+
+// const store = configureStore( { reducer: reducer, reduxDevtools } )
+
+// export default store
+
+
+export default configureStore( {
+    reducer: {
+        theme: themeReducer,
+        freelances: freelancesReducer,
+        survey: surveyReducer,
+        profile: profileReducer
+    },
+    reduxDevtools
 } )
-
-
-const store = configureStore( { reducer: reducer, reduxDevtools } )
-
-export default store
