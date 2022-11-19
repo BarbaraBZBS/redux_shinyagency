@@ -1,13 +1,12 @@
-import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import styled from 'styled-components'
 import colors from '../../utils/style/colors'
 import { Loader } from '../../utils/style/Atoms'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAnswers, selectSurvey, selectTheme } from '../../utils/selectors'
-import { fetchOrUpdateSurvey } from '../../features/survey'
+import { selectAnswers, selectTheme } from '../../utils/selectors'
 import { saveAnswers } from '../../features/answers'
+import { useQuery } from 'react-query'
 
 const SurveyContainer = styled.div`
   display: flex;
@@ -64,29 +63,31 @@ const ReplyWrapper = styled.div`
 `
 
 function Survey() {
+    const {
+        data,
+        error,
+        isLoading
+    } = useQuery( 'survey', async () => {
+        const response = await fetch( 'http://localhost:8000/survey' )
+        const data = response.json()
+        return data
+    } )
+
     const dispatch = useDispatch()
-
-    useEffect( () => {
-        dispatch( fetchOrUpdateSurvey )
-    }, [ dispatch ] )
-
     const { questionNumber } = useParams()
     const questionNumberInt = parseInt( questionNumber )
     const prevQuestionNumber = questionNumberInt === 1 ? 1 : questionNumberInt - 1
     const nextQuestionNumber = questionNumberInt + 1
     const theme = useSelector( selectTheme )
-    const survey = useSelector( selectSurvey )
     const answers = useSelector( selectAnswers )
 
 
     function saveReply( answer ) {
         dispatch( saveAnswers( { questionNumber, answer } ) )
     }
-    const surveyData = survey.data?.surveyData
+    const surveyData = data?.surveyData
 
-    const isLoading = survey.status === 'void' || survey.status === 'pending'
-
-    if ( survey.status === 'rejected' ) {
+    if ( error ) {
         return <span>Il y a un problème</span>
     }
 
